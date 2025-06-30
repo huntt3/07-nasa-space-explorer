@@ -67,6 +67,11 @@ getImagesButton.addEventListener('click', () => {
         imgDiv.appendChild(img);
         imgDiv.appendChild(caption);
 
+        // Add click event to open modal with details
+        imgDiv.addEventListener('click', () => {
+          openModal(item);
+        });
+
         // Add the div to the gallery
         gallery.appendChild(imgDiv);
       });
@@ -76,4 +81,34 @@ getImagesButton.addEventListener('click', () => {
       gallery.innerHTML = `<p>Sorry, something went wrong. Please try again later.</p>`;
       console.error(error);
     });
+
+// Modal logic
+const modal = document.getElementById('imageModal');
+const modalImg = document.getElementById('modalImg');
+const modalTitle = document.getElementById('modalTitle');
+const modalDate = document.getElementById('modalDate');
+const modalExplanation = document.getElementById('modalExplanation');
+const modalClose = document.getElementById('modalClose');
+
+// Function to open the modal and fill in details
+function openModal(item) {
+  modalImg.src = item.hdurl || item.url;
+  modalImg.alt = item.title;
+  modalTitle.textContent = item.title;
+  modalDate.textContent = item.date;
+  modalExplanation.textContent = item.explanation;
+  modal.classList.add('show');
+}
+
+// Close modal on X click
+modalClose.addEventListener('click', () => {
+  modal.classList.remove('show');
+});
+
+// Close modal when clicking outside modal content
+modal.addEventListener('click', (e) => {
+  if (e.target === modal) {
+    modal.classList.remove('show');
+  }
+});
 });
