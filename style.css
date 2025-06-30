@@ -7,7 +7,7 @@
 
 /* Base page styles */
 body {
-  font-family: Arial, sans-serif;
+  font-family: 'Public Sans', Arial, sans-serif;
   background-color: #f1f1f1;
   padding: 20px;
 }
@@ -28,10 +28,14 @@ body {
   margin-bottom: 20px;
 }
 
-h1 {
-  font-family: Verdana, sans-serif;
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Inter', Verdana, Arial, sans-serif;
   font-weight: bold;
   color: #212121;
+}
+
+h1 {
+  font-size: 2.5rem;
 }
 
 /* Logo */
@@ -171,7 +175,7 @@ button:hover {
 }
 
 .modal-content {
-  background: #1f2833;
+  background: #d6d7d9;
   color: #fff;
   margin: auto;
   padding: 24px 20px 20px 20px;
@@ -181,6 +185,7 @@ button:hover {
   box-shadow: 0 4px 24px rgba(0,0,0,0.4);
   text-align: center;
   position: relative;
+  font-family: 'Public Sans', Arial, sans-serif;
 }
 
 .modal-content img {
@@ -193,28 +198,29 @@ button:hover {
   position: absolute;
   top: 10px;
   right: 18px;
-  color: #66fcf1;
+  color: #105bd8;
   font-size: 2rem;
   font-weight: bold;
   cursor: pointer;
   transition: color 0.2s;
 }
 .modal-close:hover {
-  color: #45a29e;
+  color: #02bfe7;
 }
 
 #modalTitle {
   margin: 0 0 8px 0;
-  color: #66fcf1;
+  color: #105bd8;
   font-size: 1.3rem;
 }
 #modalDate {
+  font-family: 'DM Mono', 'Courier New', Courier, monospace;
   margin: 0 0 12px 0;
-  color: #bfbfbf;
+  color: #0b3d91;
   font-size: 1rem;
 }
 #modalExplanation {
-  color: #fff;
+  color: #000000;
   font-size: 1rem;
   margin: 0;
 }
@@ -224,7 +230,7 @@ button:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #45a29e;
+  color: #105bd8;
   font-size: 1.2rem;
   margin: 40px 0 20px 0;
   gap: 8px;
