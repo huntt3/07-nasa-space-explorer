@@ -1,8 +1,14 @@
+//Credits
+//https://www.astronomy.com/astronomy-for-beginners/20-unusual-space-facts/
+
+
 // Find our date picker inputs on the page
 const startInput = document.getElementById('startDate');
 const endInput = document.getElementById('endDate');
 const getImagesButton = document.querySelector('button');
 const gallery = document.getElementById('gallery');
+
+document.getElementById("spaceFactContainer").style.display = "none";
 
 // Call the setupDateInputs function from dateRange.js
 // This sets up the date pickers to:
@@ -25,7 +31,7 @@ getImagesButton.addEventListener('click', () => {
     alert('Please select both a start and end date.');
     return;
   }
-
+  document.getElementById("spaceFactContainer").style.display = "inline-flex";
   // Build the API URL with the selected dates
   const url = `${API_URL}?api_key=${API_KEY}&start_date=${startDate}&end_date=${endDate}`;
 
@@ -195,4 +201,29 @@ modal.addEventListener('click', (e) => {
     modal.classList.remove('show');
   }
 });
+
+// Show a random space fact in the spaceFactContainer
+
+// Fetch the spaceFacts.json file
+fetch('spaceFacts.json')
+  .then(response => response.json()) // Parse the JSON data
+  .then(facts => {
+    // Get the element where we want to show the fact
+    const factText = document.getElementById('spaceFactText');
+    // Check if we got an array of facts
+    if (Array.isArray(facts) && facts.length > 0) {
+      // Pick a random fact from the array
+      const randomFact = facts[Math.floor(Math.random() * facts.length)];
+      // Show the random fact in the page
+      factText.textContent = randomFact;
+    } else {
+      // If no facts, show a default message
+      factText.textContent = 'Explore the universe with NASA!';
+    }
+  })
+  .catch(() => {
+    // If there was an error, show a default message
+    const factText = document.getElementById('spaceFactText');
+    factText.textContent = 'Explore the universe with NASA!';
+  });
 });
