@@ -133,6 +133,12 @@ const modalClose = document.getElementById('modalClose');
 
 // Function to open the modal and fill in details
 function openModal(item) {
+  // Always hide both modalImg and modalVideo at first
+  modalImg.style.display = 'none';
+  const modalVideo = document.getElementById('modalVideo');
+  modalVideo.style.display = 'none';
+  modalVideo.src = '';
+
   if (item.media_type === 'image') {
     modalImg.style.display = '';
     modalImg.src = item.hdurl || item.url;
@@ -140,53 +146,46 @@ function openModal(item) {
     modalImg.style.maxHeight = '350px';
     modalImg.style.width = '100%';
   } else if (item.media_type === 'video') {
-    // Hide the image and show the video embed or link
-    modalImg.style.display = 'none';
+    let videoId = '';
+    let isYouTube = false;
+    if (item.url.includes('youtube.com')) {
+      const urlObj = new URL(item.url);
+      videoId = urlObj.searchParams.get('v');
+      if (videoId && videoId.includes('&')) {
+        videoId = videoId.split('&')[0];
+      }
+      isYouTube = true;
+    } else if (item.url.includes('youtu.be')) {
+      videoId = item.url.split('youtu.be/')[1];
+      if (videoId && videoId.includes('?')) {
+        videoId = videoId.split('?')[0];
+      }
+      isYouTube = true;
+    }
+    if (isYouTube && videoId) {
+      modalVideo.style.display = '';
+      modalVideo.src = `https://www.youtube.com/embed/${videoId}`;
+      modalVideo.width = '100%';
+      modalVideo.height = '350';
+      modalVideo.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+      modalVideo.allowFullscreen = true;
+      modalVideo.frameBorder = '0';
+    } else if (item.url) {
+      // For non-YouTube videos, embed the video URL directly
+      modalVideo.style.display = '';
+      modalVideo.src = item.url;
+      modalVideo.width = '100%';
+      modalVideo.height = '350';
+      modalVideo.allow = '';
+      modalVideo.allowFullscreen = true;
+      modalVideo.frameBorder = '0';
+    } else {
+      modalVideo.style.display = 'none';
+    }
   }
   modalTitle.textContent = item.title;
   modalDate.textContent = item.date;
   modalExplanation.textContent = item.explanation;
-
-  // Remove any previous video iframe or link
-  const oldVideo = document.getElementById('modalVideo');
-  if (oldVideo) oldVideo.remove();
-
-  if (item.media_type === 'video') {
-    let videoElem;
-    if (item.url.includes('youtube.com') || item.url.includes('youtu.be')) {
-      // Extract YouTube video ID
-      let videoId = '';
-      if (item.url.includes('youtube.com')) {
-        const urlParams = new URL(item.url).searchParams;
-        videoId = urlParams.get('v');
-      } else if (item.url.includes('youtu.be')) {
-        videoId = item.url.split('youtu.be/')[1];
-      }
-      if (videoId) {
-        videoElem = document.createElement('iframe');
-        videoElem.src = `https://www.youtube.com/embed/${videoId}`;
-        videoElem.width = '100%';
-        videoElem.height = '350';
-        videoElem.frameBorder = '0';
-        videoElem.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
-        videoElem.allowFullscreen = true;
-        videoElem.id = 'modalVideo';
-      }
-    }
-    if (!videoElem) {
-      // Fallback: just show a link
-      videoElem = document.createElement('a');
-      videoElem.href = item.url;
-      videoElem.target = '_blank';
-      videoElem.textContent = 'Watch Video';
-      videoElem.id = 'modalVideo';
-      videoElem.style.display = 'block';
-      videoElem.style.margin = '20px auto';
-      videoElem.style.color = '#66fcf1';
-    }
-    // Insert video element after modalTitle
-    modalTitle.insertAdjacentElement('afterend', videoElem);
-  }
   modal.classList.add('show');
 }
 
