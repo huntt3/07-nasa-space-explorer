@@ -29,11 +29,19 @@ getImagesButton.addEventListener('click', () => {
   // Build the API URL with the selected dates
   const url = `${API_URL}?api_key=${API_KEY}&start_date=${startDate}&end_date=${endDate}`;
 
+  // Show loading message before fetching
+  gallery.innerHTML = `
+    <div class="loading-message">
+      <span class="material-symbols-outlined" style="font-size:2.2rem;vertical-align:middle;">rocket_launch</span>
+      <span style="margin-left:8px;vertical-align:middle;">Loading space photos…</span>
+    </div>
+  `;
+
   // Fetch images from NASA API
   fetch(url)
     .then(response => response.json())
     .then(data => {
-      // Remove the placeholder
+      // Remove the loading message
       gallery.innerHTML = '';
 
       // If the API returns a single object, put it in an array

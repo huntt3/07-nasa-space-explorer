@@ -210,3 +210,14 @@ button:hover {
   font-size: 1rem;
   margin: 0;
 }
+
+/* Loading message style */
+.loading-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #45a29e;
+  font-size: 1.2rem;
+  margin: 40px 0 20px 0;
+  gap: 8px;
+}
