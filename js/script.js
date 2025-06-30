@@ -47,41 +47,78 @@ getImagesButton.addEventListener('click', () => {
       // If the API returns a single object, put it in an array
       const images = Array.isArray(data) ? data : [data];
 
-      // Only show up to 9 images and only images (not videos)
-      const imagesToShow = images.filter(item => item.media_type === 'image').slice(0, 9);
+      // Only show up to 9 entries (images or videos)
+      const entriesToShow = images.slice(0, 9);
 
-      // If no images, show a message
-      if (imagesToShow.length === 0) {
-        gallery.innerHTML = '<p>No images found for this date range.</p>';
+      // If no entries, show a message
+      if (entriesToShow.length === 0) {
+        gallery.innerHTML = '<p>No images or videos found for this date range.</p>';
         return;
       }
 
-      // Loop through each image and add it to the gallery
-      imagesToShow.forEach(item => {
-        // Create a div for each image
-        const imgDiv = document.createElement('div');
-        imgDiv.className = 'gallery-item';
+      // Loop through each entry and add it to the gallery
+      entriesToShow.forEach(item => {
+        const entryDiv = document.createElement('div');
+        entryDiv.className = 'gallery-item';
 
-        // Create the image element
-        const img = document.createElement('img');
-        img.src = item.url;
-        img.alt = item.title;
+        if (item.media_type === 'image') {
+          // Create the image element
+          const img = document.createElement('img');
+          img.src = item.url;
+          img.alt = item.title;
+          entryDiv.appendChild(img);
+        } else if (item.media_type === 'video') {
+          // If it's a YouTube video, embed it
+          if (item.url.includes('youtube.com') || item.url.includes('youtu.be')) {
+            // Extract YouTube video ID
+            let videoId = '';
+            if (item.url.includes('youtube.com')) {
+              const urlParams = new URL(item.url).searchParams;
+              videoId = urlParams.get('v');
+            } else if (item.url.includes('youtu.be')) {
+              videoId = item.url.split('youtu.be/')[1];
+            }
+            if (videoId) {
+              const iframe = document.createElement('iframe');
+              iframe.src = `https://www.youtube.com/embed/${videoId}`;
+              iframe.width = '100%';
+              iframe.height = '200';
+              iframe.frameBorder = '0';
+              iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+              iframe.allowFullscreen = true;
+              entryDiv.appendChild(iframe);
+            } else {
+              // Fallback: just show a link
+              const link = document.createElement('a');
+              link.href = item.url;
+              link.target = '_blank';
+              link.textContent = 'Watch Video';
+              entryDiv.appendChild(link);
+            }
+          } else {
+            // Not a YouTube video, just show a link
+            const link = document.createElement('a');
+            link.href = item.url;
+            link.target = '_blank';
+            link.textContent = 'Watch Video';
+            entryDiv.appendChild(link);
+          }
+        }
 
         // Create a caption
         const caption = document.createElement('p');
         caption.textContent = item.title;
+        entryDiv.appendChild(caption);
 
-        // Add image and caption to the div
-        imgDiv.appendChild(img);
-        imgDiv.appendChild(caption);
-
-        // Add click event to open modal with details
-        imgDiv.addEventListener('click', () => {
+        // Add click event to open modal with details (for both images and videos)
+        entryDiv.addEventListener('click', (e) => {
+          // Prevent modal from opening if user clicks a link or iframe
+          if (e.target.tagName === 'A' || e.target.tagName === 'IFRAME') return;
           openModal(item);
         });
 
         // Add the div to the gallery
-        gallery.appendChild(imgDiv);
+        gallery.appendChild(entryDiv);
       });
     })
     .catch(error => {
@@ -100,11 +137,60 @@ const modalClose = document.getElementById('modalClose');
 
 // Function to open the modal and fill in details
 function openModal(item) {
-  modalImg.src = item.hdurl || item.url;
-  modalImg.alt = item.title;
+  if (item.media_type === 'image') {
+    modalImg.style.display = '';
+    modalImg.src = item.hdurl || item.url;
+    modalImg.alt = item.title;
+    modalImg.style.maxHeight = '350px';
+    modalImg.style.width = '100%';
+  } else if (item.media_type === 'video') {
+    // Hide the image and show the video embed or link
+    modalImg.style.display = 'none';
+  }
   modalTitle.textContent = item.title;
   modalDate.textContent = item.date;
   modalExplanation.textContent = item.explanation;
+
+  // Remove any previous video iframe or link
+  const oldVideo = document.getElementById('modalVideo');
+  if (oldVideo) oldVideo.remove();
+
+  if (item.media_type === 'video') {
+    let videoElem;
+    if (item.url.includes('youtube.com') || item.url.includes('youtu.be')) {
+      // Extract YouTube video ID
+      let videoId = '';
+      if (item.url.includes('youtube.com')) {
+        const urlParams = new URL(item.url).searchParams;
+        videoId = urlParams.get('v');
+      } else if (item.url.includes('youtu.be')) {
+        videoId = item.url.split('youtu.be/')[1];
+      }
+      if (videoId) {
+        videoElem = document.createElement('iframe');
+        videoElem.src = `https://www.youtube.com/embed/${videoId}`;
+        videoElem.width = '100%';
+        videoElem.height = '350';
+        videoElem.frameBorder = '0';
+        videoElem.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+        videoElem.allowFullscreen = true;
+        videoElem.id = 'modalVideo';
+      }
+    }
+    if (!videoElem) {
+      // Fallback: just show a link
+      videoElem = document.createElement('a');
+      videoElem.href = item.url;
+      videoElem.target = '_blank';
+      videoElem.textContent = 'Watch Video';
+      videoElem.id = 'modalVideo';
+      videoElem.style.display = 'block';
+      videoElem.style.margin = '20px auto';
+      videoElem.style.color = '#66fcf1';
+    }
+    // Insert video element after modalTitle
+    modalTitle.insertAdjacentElement('afterend', videoElem);
+  }
   modal.classList.add('show');
 }
 
