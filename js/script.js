@@ -61,48 +61,38 @@ getImagesButton.addEventListener('click', () => {
         const entryDiv = document.createElement('div');
         entryDiv.className = 'gallery-item';
 
+        // Show image or video thumbnail
+        let img = null;
         if (item.media_type === 'image') {
-          // Create the image element
-          const img = document.createElement('img');
+          img = document.createElement('img');
           img.src = item.url;
           img.alt = item.title;
-          entryDiv.appendChild(img);
         } else if (item.media_type === 'video') {
-          // If it's a YouTube video, embed it
-          if (item.url.includes('youtube.com') || item.url.includes('youtu.be')) {
-            // Extract YouTube video ID
-            let videoId = '';
-            if (item.url.includes('youtube.com')) {
-              const urlParams = new URL(item.url).searchParams;
-              videoId = urlParams.get('v');
-            } else if (item.url.includes('youtu.be')) {
-              videoId = item.url.split('youtu.be/')[1];
-            }
-            if (videoId) {
-              const iframe = document.createElement('iframe');
-              iframe.src = `https://www.youtube.com/embed/${videoId}`;
-              iframe.width = '100%';
-              iframe.height = '200';
-              iframe.frameBorder = '0';
-              iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
-              iframe.allowFullscreen = true;
-              entryDiv.appendChild(iframe);
-            } else {
-              // Fallback: just show a link
-              const link = document.createElement('a');
-              link.href = item.url;
-              link.target = '_blank';
-              link.textContent = 'Watch Video';
-              entryDiv.appendChild(link);
-            }
-          } else {
-            // Not a YouTube video, just show a link
-            const link = document.createElement('a');
-            link.href = item.url;
-            link.target = '_blank';
-            link.textContent = 'Watch Video';
-            entryDiv.appendChild(link);
+          // Try to get YouTube thumbnail if possible
+          let thumbUrl = '';
+          let videoId = '';
+          if (item.url.includes('youtube.com')) {
+            const urlParams = new URL(item.url).searchParams;
+            videoId = urlParams.get('v');
+          } else if (item.url.includes('youtu.be')) {
+            videoId = item.url.split('youtu.be/')[1];
           }
+          if (videoId) {
+            thumbUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+          } else if (item.thumbnail_url) {
+            thumbUrl = item.thumbnail_url;
+          } else {
+            // fallback: use a generic video icon or NASA logo
+            thumbUrl = 'img/NASA-Logo-Large.jpg';
+          }
+          img = document.createElement('img');
+          img.src = thumbUrl;
+          img.alt = item.title + ' (video)';
+          // Add a play icon overlay for clarity
+          img.style.position = 'relative';
+        }
+        if (img) {
+          entryDiv.appendChild(img);
         }
 
         // Create a caption
