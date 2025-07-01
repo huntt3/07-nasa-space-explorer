@@ -78,8 +78,7 @@ getImagesButton.addEventListener('click', () => {
           let thumbUrl = '';
           let videoId = '';
           if (item.url.includes('youtube.com')) {
-            const urlParams = new URL(item.url).searchParams;
-            videoId = urlParams.get('v');
+            videoId = getYouTubeVideoId(item.url);
           } else if (item.url.includes('youtu.be')) {
             videoId = item.url.split('youtu.be/')[1];
           }
@@ -226,3 +225,14 @@ fetch('spaceFacts.json')
     factText.textContent = 'Explore the universe with NASA!';
   });
 });
+
+function getYouTubeVideoId(url) {
+  if (url.includes("youtu.be/")) {
+    return url.split("youtu.be/")[1].split("/[?&]/")[0];
+  } else if (url.includes("youtube.com/watch?v=")) {
+    return url.split("v=")[1].split("&")[0];
+  } else if (url.includes("youtube.com/embed/")) {
+    return url.split("embed/")[1].split("?")[0];
+  }
+  return null;
+}
